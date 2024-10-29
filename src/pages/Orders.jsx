@@ -35,7 +35,7 @@ function Orders() {
         },
         body: JSON.stringify({
           status: newStatus,
-          orderId: selectedOrder.id,
+          orderId: selectedOrder.orderId,
         }),
       });
 
