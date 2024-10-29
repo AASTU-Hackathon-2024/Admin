@@ -1,26 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 function Orders() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [newStatus, setNewStatus] = useState('');
+  const [newStatus, setNewStatus] = useState("");
 
   useEffect(() => {
-    fetch('http://localhost:8000/order/list')
-      .then(async response => {
+    fetch("http://localhost:8000/order/list")
+      .then(async (response) => {
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to fetch orders');
+          throw new Error(errorData.message || "Failed to fetch orders");
         }
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setOrders(data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error.message);
         setLoading(false);
       });
@@ -29,27 +29,34 @@ function Orders() {
   const handleUpdateStatus = async () => {
     try {
       const response = await fetch(`http://localhost:8000/order/update`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({
+          status: newStatus,
+          orderId: selectedOrder.id,
+        }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update order status');
+        throw new Error(errorData.message || "Failed to update order status");
       }
 
       const result = await response.json();
       alert(result.message);
 
       // Update the status in the state
-      setOrders(orders.map(order => 
-        order.id === selectedOrder.id ? { ...order, status: newStatus } : order
-      ));
+      setOrders(
+        orders.map((order) =>
+          order.id === selectedOrder.id
+            ? { ...order, status: newStatus }
+            : order
+        )
+      );
       setSelectedOrder(null);
-      setNewStatus('');
+      setNewStatus("");
     } catch (error) {
       alert(error.message);
     }
@@ -57,18 +64,22 @@ function Orders() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'COMPLETED': 'bg-green-100 text-green-800',
-      'PROCESSING': 'bg-purple-100 text-purple-800',
-      'REJECTED': 'bg-red-100 text-red-800',
-      'ON HOLD': 'bg-orange-100 text-orange-800',
-      'IN TRANSIT': 'bg-pink-100 text-pink-800',
-      'PENDING': 'bg-yellow-100 text-yellow-800'
+      COMPLETED: "bg-green-100 text-green-800",
+      PROCESSING: "bg-purple-100 text-purple-800",
+      REJECTED: "bg-red-100 text-red-800",
+      "ON HOLD": "bg-orange-100 text-orange-800",
+      "IN TRANSIT": "bg-pink-100 text-pink-800",
+      PENDING: "bg-yellow-100 text-yellow-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
@@ -83,16 +94,36 @@ function Orders() {
         <table className="min-w-full">
           <thead>
             <tr className="border-b">
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">User ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Product ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Variation ID</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Amount</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Shipping Address</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Zipcode</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Phone</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                User ID
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Product ID
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Variation ID
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Amount
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Shipping Address
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Zipcode
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -104,7 +135,11 @@ function Orders() {
                 <td className="px-6 py-4 text-sm">{order.variationId}</td>
                 <td className="px-6 py-4 text-sm">{order.amount}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs ${getStatusColor(
+                      order.status
+                    )}`}
+                  >
                     {order.status}
                   </span>
                 </td>
