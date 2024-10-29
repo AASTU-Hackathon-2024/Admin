@@ -74,15 +74,25 @@ function Products() {
         {products.map((product) => {
           const imgUrls = JSON.parse(product.variations[0].imgUrl);
           return (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div
+              key={product.id}
+              className="bg-white rounded-lg shadow-sm overflow-hidden"
+            >
               <div className="w-full h-48 overflow-hidden">
                 {imgUrls.map((url, index) => (
-                  <img key={index} src={url} alt={product.title} className="w-full h-full object-cover" />
+                  <img
+                    key={index}
+                    src={url}
+                    alt={product.title}
+                    className="w-full h-full object-contain object-center"
+                  />
                 ))}
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-medium">{product.title}</h3>
-                <p className="text-blue-600 font-medium mt-2">{product.price}.00 Birr</p>
+                <p className="text-blue-600 font-medium mt-2">
+                  {product.price}.00 Birr
+                </p>
                 <button
                   onClick={() => handleDelete(product.productId)}
                   className="bg-red-500 text-white px-4 py-2 rounded-lg mt-4"
