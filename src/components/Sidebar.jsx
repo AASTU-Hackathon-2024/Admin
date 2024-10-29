@@ -4,7 +4,7 @@ import {
   CubeIcon, 
   ClipboardDocumentListIcon, 
   ArchiveBoxIcon,
-  Cog6ToothIcon,
+  Cog6ToothIcon, UsersIcon,
   ArrowLeftOnRectangleIcon 
 } from '@heroicons/react/24/outline';
 
@@ -16,6 +16,7 @@ function Sidebar() {
     { path: '/products', name: 'Products', icon: CubeIcon },
     { path: '/orders', name: 'Order Lists', icon: ClipboardDocumentListIcon },
     { path: '/stock', name: 'Product Stock', icon: ArchiveBoxIcon },
+    { path: '/users', name: 'Users', icon: UsersIcon },
   ];
 
   const isActive = (path) => location.pathname === path;

@@ -1,65 +1,61 @@
+import { useEffect, useState } from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 function ProductStock() {
-  const products = [
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      name: 'Apple Watch Series 4',
-      category: 'Digital Product',
-      price: '$690.00',
-      piece: 63,
-      colors: ['black', 'gray', 'pink']
-    },
-    
-  ];
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/products/list')
+      .then(async response => {
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to fetch products');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError(error.message);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this product?');
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`http://localhost:8000/products/delete?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete product');
+      }
+
+      const result = await response.json();
+      alert(result.message);
+
+      // Remove the deleted product from the state
+      setProducts(products.filter(product => product.id !== id));
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
@@ -78,47 +74,29 @@ function ProductStock() {
         <table className="min-w-full">
           <thead>
             <tr className="border-b">
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Image</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Product Name</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Category</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Price</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Piece</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Available Color</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Action</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Stock</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Color</th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
-              <tr key={index} className="border-b">
-                <td className="px-6 py-4">
-                  <img src={product.image} alt={product.name} className="w-12 h-12 rounded-lg" />
-                </td>
-                <td className="px-6 py-4">{product.name}</td>
-                <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">{product.price}</td>
-                <td className="px-6 py-4">{product.piece}</td>
-                <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    {product.colors.map((color, i) => (
-                      <div
-                        key={i}
-                        className="w-6 h-6 rounded-full"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex space-x-2">
-                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                      <PencilIcon className="w-5 h-5" />
-                    </button>
-                    <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                      <TrashIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+            {products.map((product) => (
+              product.variations && product.variations.map((variation, index) => (
+                <tr key={`${product.id}-${index}`} className="border-b">
+                  <td className="px-6 py-4">{product.title}</td>
+                  <td className="px-6 py-4">{product.category}</td>
+                  <td className="px-6 py-4">{product.price}</td>
+                  <td className="px-6 py-4">{variation.stock}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className="w-6 h-6 rounded-full"
+                      style={{ backgroundColor: variation.color }}
+                    />
+                  </td>
+                </tr>
+              ))
             ))}
           </tbody>
         </table>
